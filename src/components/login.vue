@@ -145,7 +145,7 @@ export default {
     font-size: 0.13rem;
   }
   .g-username {
-    margin-top: 0.9%;
+    margin-top: 18%;
     margin-bottom: 3%;
   }
   .g-username:focus-within input {
@@ -154,10 +154,6 @@ export default {
   .g-password {
     margin-bottom: 0.2%;
   }
-  .g-password:focus-within ~ img {
-    display: none;
-  }
-
   .g-password:focus-within input {
     border-color: #007fff;
   }
@@ -168,7 +164,7 @@ export default {
     color: #fff;
     font-size: 0.15rem;
     border-radius: 1rem;
-    margin-top: 5%;
+    margin-top: 13%;
   }
   .signIn {
     margin-top: 4%;
