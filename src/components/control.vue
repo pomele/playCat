@@ -13,13 +13,13 @@
     </nav>
     <div class="main">
       <div id="display" class="display">
-<!--        这个div层展示摄像头内容-->
+        <!--        这个div层展示摄像头内容-->
         <img src="http://34.80.201.30:8080/?action=stream" class="screenImg">
       </div>
       <div id="display_upper" class="display_upper">
-        <div class="cavasScreen" @click="clickScreen($event)">
-<!--          鼠标点击图片-->
-<!--          <canvas id="canvas"></canvas>-->
+        <div class="cavasScreen">
+          <!--          鼠标点击图片-->
+          <!--          <canvas id="canvas"></canvas>-->
         </div>
         <div class="controlScreen">
           <button class="controlButton">
@@ -40,21 +40,15 @@
         </div>
       </div>
       <div id="control" class="control">
-        <div id="autoTime" class="autoTime">
-          <p style="text-align: left">设置运动时间</p>
-          <p style="text-align: left; font-size: 0.24rem; font-weight: bold; align-items: center;">
-            分钟
-            <input style="width: 30%;height: 0.2rem; margin-left: 5%; margin-top: 0; border:1px dashed #000;" />
-            <button class="buttonStart">开始</button>
-          </p>
+        <div id="controlPoint" class="controlPoint">
+          <div class="up"></div>
+          <div class="left"></div>
+          <div class="right"></div>
+          <div class="down"></div>
         </div>
-        <div id="manualTime" class="manualTime">
-          <p style="text-align: left">运动时间</p>
-          <p style="text-align: left; font-size: 0.24rem; font-weight: bold">00：15：00</p>
-        </div>
-        <div class="call" @click="clickCall"><span>呼叫</span></div>
-        <div class="auto" @click="clickAuto"><span>自动逗猫</span></div>
-        <div class="manual" @click="clickManual"><span>手动逗猫</span></div>
+        <div class="aiming" @click="clickAimging"><span>标定</span></div>
+        <div class="invite" @click="clickInvite"><span>邀请</span></div>
+        <div class="health" @click="clickHealth"><span>健康</span></div>
       </div>
     </div>
   </div>
@@ -67,21 +61,17 @@ export default {
   data () {
     return {
       msg: 'Welcome to Your Vue.js App',
-      path: 'ws://34.80.201.30:8087/user_action',
-      socket: '',
-      type: 0,
-      opId: 0,
-      id: 'wenchaer',
-      is_open: false
+      path: 'ws://192.168.0.200:8005/qrCodePage/ID=1/refreshTime=5',
+      socket: ''
     }
   },
   mounted () {
     this.updateSize()
-    this.initSocket()
     window.onresize = function () {
       this.updateSize()
     }
     this.drawDot()
+    this.initSocket()
   },
   methods: {
     updateSize () {
@@ -110,36 +100,11 @@ export default {
         displayUpper.style.height = ((Number(width) * 3) / 4) + 'px'
       }
     },
-    clickAuto () {
-      document.getElementById('autoTime').style.display = 'block'
-      document.getElementById('manualTime').style.display = 'none'
+    clickInvite () {
     },
-    clickManual () {
-      document.getElementById('autoTime').style.display = 'none'
-      document.getElementById('manualTime').style.display = 'block'
-      // 打开websocket
-      // 处理发送的数据
-      this.type = 1
-      this.opId += 1
-      let firstSend = {'type': this.type, 'id': this.id, 'opid': this.opId}
-      this.socket.send(JSON.stringify(firstSend))
-      console.log('first成功')
+    clickHealth () {
     },
-    clickScreen (e) {
-      // 获取元素宽高大小
-      let width = document.getElementById('display').offsetWidth
-      let height = document.getElementById('display').offsetHeight
-      let x = width - e.offsetX
-      let y = height - e.offsetY
-      console.log(x + y)
-      this.is_open = true
-      this.type = 2
-      this.opId += 1
-      let secondSend = {'type': this.type, 'id': this.id, 'opid': this.opId, 'x': x, 'y': y, 'w': width, 'h': height, 'is_open': this.is_open}
-      this.socket.send(JSON.stringify(secondSend))
-      console.log('second成功')
-    },
-    clickCall () {
+    clickAimging () {
       console.log('')
     },
     drawDot () {
@@ -149,7 +114,6 @@ export default {
       context.strokeRect(120, 0, 100, 100)
     },
     initSocket () {
-      console.log('hello')
       if (typeof (WebSocket) === 'undefined') {
         alert('您的浏览器不支持socket')
       } else {
@@ -164,8 +128,6 @@ export default {
       }
     },
     open () {
-      // let firstSend = {'type': this.type, 'id': this.id, 'opid': this.opId}
-      // this.socket.send(JSON.stringify(firstSend))
       console.log('socket连接成功')
     },
     error () {
@@ -193,8 +155,8 @@ export default {
     position: absolute;
     left: 0; right: 0; top: 0; bottom: 0;
     width:100%;
-    background: url('../assets/bg.png');
-    /*background: red;*/
+    background: url("../assets/bg.png");
+    /*background: white;*/
     background-size: auto;
   }
   nav {
@@ -274,17 +236,7 @@ export default {
       background: #9cc;
       box-shadow: 0 0 1rem gold;
     }
-    .autoTime .manualTime {
-      width: 90%;
-      height: 20%;
-      margin: auto;
-      font-size: 0.03rem;
-      /*background: red;*/
-    }
-    .manualTime {
-      display: none;
-    }
-    .call {
+    .aiming {
       width: 50%;
       height: 15%;
       margin: auto;
@@ -296,13 +248,13 @@ export default {
       position: relative;
       cursor: pointer;
     }
-    .call span {
+    .aiming span {
       position: absolute;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
     }
-    .auto {
+    .invite {
       width: 50%;
       height: 15%;
       margin: auto;
@@ -314,13 +266,13 @@ export default {
       position: relative;
       cursor: pointer;
     }
-    .auto span {
+    .invite span {
       position: absolute;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
     }
-    .manual {
+    .health {
       width: 50%;
       height: 15%;
       margin: auto;
@@ -333,11 +285,11 @@ export default {
       cursor: pointer;
     }
     /*写到这里了*/
-    .manual:focus-within {
+    .health:focus-within {
       background: yellow;
       box-shadow: 0 0 1em #000;
     }
-    .manual span {
+    .health span {
       position: absolute;
       left: 50%;
       top: 50%;
@@ -407,21 +359,94 @@ export default {
       background: #9cc;
       box-shadow: 0 0 1rem gold;
     }
-    .autoTime .manualTime {
-      width: 90%;
-      height: 20%;
-      margin: auto;
-      font-size: 0.10rem;
-      /*background: red;*/
+    .controlPoint {
+      width: 2rem;
+      height: 2rem;
+      margin: 3% auto auto auto;
+      border-radius: 1rem;
+      background:rgba(255,255,255,1);
+      box-shadow:0px 3px 5px 3px rgba(255,151,59,0.39),0px 1px 3px 0px rgba(0,0,0,0.5);
+      border:2px solid rgba(255,180,0,1)
     }
-    .manualTime {
-      display: none;
+    .up {
+      transform: translate(0.8rem, 0rem);
+      position: absolute;
+      cursor: pointer;
     }
-    .call {
+    .up:before,.up:after{
+      position: absolute;
+      content: '';
+      border-top: 0.2rem transparent dashed;
+      border-left: 0.2rem transparent dashed;
+      border-bottom: 0.2rem #FF973B solid;
+      border-right: 0.2rem transparent dashed;
+    }
+    .up:before{
+      /*border-bottom: 0.2rem #FF973B solid;*/
+    }
+    .up:after{
+      top: 0.05rem; /*覆盖并错开1px*/
+      border-bottom: 0.2rem #fff solid;
+    }
+    .left {
+      display: inline-block;
+      transform: translate(-1rem, 0.8rem);
+      position: absolute;
+      cursor: pointer;
+    }
+    .left:before,.left:after{
+      position: absolute;
+      content: '';
+      border-top: 0.2rem transparent dashed;
+      border-left: 0.2rem transparent dashed;
+      border-bottom: 0.2rem transparent dashed;
+      border-right: 0.2rem #FF973B solid;
+    }
+    .left:after{
+      left: 0.05rem; /*覆盖并错开1px*/
+      border-right: 0.2rem #fff solid;
+    }
+    .right {
+      display: inline-block;
+      transform: translate(0.6rem, 0.8rem);
+      position: absolute;
+      cursor: pointer;
+    }
+    .right:before,.right:after{
+      position: absolute;
+      content: '';
+      border-top: 0.2rem transparent dashed;
+      border-left: 0.2rem #FF973B solid;
+      border-bottom: 0.2rem transparent dashed;
+      border-right: 0.2rem transparent dashed;
+    }
+    .right:after{
+      left: -0.05rem; /*覆盖并错开1px*/
+      border-left: 0.2rem #fff solid;
+    }
+    .down {
+      margin-bottom: auto;
+      transform: translate(0.8rem, 1.6rem);
+      position: absolute;
+      cursor: pointer;
+    }
+    .down:before,.down:after{
+      position: absolute;
+      content: '';
+      border-top: 0.2rem #FF973B solid;
+      border-left: 0.2rem transparent dashed;
+      border-bottom: 0.2rem transparent dashed;
+      border-right: 0.2rem transparent dashed;
+    }
+    .down:after{
+      top: -0.05rem; /*覆盖并错开1px*/
+      border-top: 0.2rem #fff solid;
+    }
+    .aiming {
       width: 60%;
       height: 10%;
       margin: auto;
-      margin-top: 90%;
+      margin-top: 50%;
       background: #FF861B;
       text-align: center;
       color: #fff;
@@ -429,13 +454,13 @@ export default {
       position: relative;
       cursor: pointer;
     }
-    .call span {
+    .aiming span {
       position: absolute;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
     }
-    .auto {
+    .invite {
       width: 60%;
       height: 10%;
       margin: auto;
@@ -447,13 +472,13 @@ export default {
       position: relative;
       cursor: pointer;
     }
-    .auto span {
+    .invite span {
       position: absolute;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
     }
-    .manual {
+    .health {
       width: 60%;
       height: 10%;
       margin: auto;
@@ -465,14 +490,14 @@ export default {
       position: relative;
       cursor: pointer;
     }
-    .manual span {
+    .health span {
       position: absolute;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
     }
     /*写到这里了*/
-    .manual:focus-within {
+    .health:focus-within {
       background: yellow;
       box-shadow: 0 0 1em #000;
     }
@@ -498,6 +523,5 @@ export default {
   .screenImg {
     width: 100%;
     height: 100%;
-    transform:rotate(180deg)
   }
 </style>

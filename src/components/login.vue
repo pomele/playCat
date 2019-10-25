@@ -16,12 +16,12 @@
           <p class="login_type">密码登陆</p>
           <p class="login_type">邀请码登陆</p>
           <div class="g-username">
-            <input name="loginPhoneOrEmail" maxlength="64" placeholder="手机号/用户名" class="input">
+            <input name="loginPhoneOrEmail" v-model="username" maxlength="64" placeholder="手机号/用户名" class="input">
           </div>
           <div class="g-password">
-            <input name="loginPassword" type="password" maxlength="64" placeholder="密码" class="input">
+            <input name="loginPassword" v-model="password" type="password" maxlength="64" placeholder="密码" class="input">
           </div>
-          <button class="button_login">
+          <button class="button_login" @click="login">
             登录
           </button>
           <p class="signIn">忘记密码|注册账号</p>
@@ -31,11 +31,73 @@
   </div>
 </template>
 <script>
+import axios from '@/config/axios.config'
 export default {
   name: 'login',
+  beforeRouteEnter (to, from, next) {
+    next(() => {
+      sessionStorage.clear()
+    })
+  },
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: 'Welcome to Your Vue.js App',
+      username: 'wenchaer',
+      password: 'qazwsxedc',
+      loginUrl: '',
+      userInfo: {
+        username: '',
+        password: '',
+        token: ''
+      },
+      isPickModules: false,
+      initModules: [
+        {permission: 'SARA_MANAGER', route: '/home/sara/account/list'},
+        {permission: 'SARA_AD_OWNER', route: '/home/sara/advertiser/display'},
+        {permission: 'SARA_MEDIA', route: '/home/sara/media/my_effect'},
+        {permission: 'OFFLINE_BUSINESS', route: '/home/offline/business/home'},
+        {permission: 'OFFLINE_AD_OWNER', route: '/home/offline/ad/effect'},
+        {permission: 'FOCUS_MEDIA', route: '/home/sensefocus/media'},
+        {permission: 'FOCUS_MANAGER', route: '/home/modules'},
+        {permission: 'FOCUS_AD_OWNER', route: '/home/sensefocus/adowner'},
+        {permission: 'FOCUS_DISPLAY', route: 'home/sensefocus/display/list'}
+      ]
+    }
+  },
+  methods: {
+    login () {
+      this.$router.push('/')
+      this.userInfo.csessionid = this.$refs.csessionid.value
+      this.userInfo.token = this.$refs.token.value
+      let userInfo = Object.assign({}, this.userInfo)
+      userInfo.accountPwd = this.encrypt(this.userInfo.accountPwd)
+      axios.post(this.loginUrl, userInfo).then((res) => {
+        sessionStorage.removeItem('username')
+        sessionStorage.removeItem('password')
+        sessionStorage.removeItem('permissions')
+        sessionStorage.removeItem('auth')
+        if (res.data.user) {
+          this.$Notice.success({
+            title: '登录成功'
+          })
+        }
+        this.setLogin(res.data.user)
+        this.pickModules(this.initModules)
+      })
+        .catch((err) => {
+          if (err.response.data.errCode === '1111') {
+            window.location.reload()
+          }
+        })
+      this.$router.push('control')
+    },
+    pickModules (initModules) {
+      initModules.forEach((module) => {
+        // if (hasPermission(module.permission)) {
+        //   this.$router.push(module.route)
+        //   this.isPickModules = true
+        // }
+      })
     }
   }
 }
@@ -158,11 +220,14 @@ export default {
     border-color: #007fff;
   }
   .button_login {
+    outline: none;
+    cursor: pointer;
     width: 40%;
     height: 15%;
     background-color: #FF9F00;
     color: #fff;
     font-size: 0.15rem;
+    border: 0px;
     border-radius: 1rem;
     margin-top: 13%;
   }
